@@ -1,8 +1,11 @@
 package cc.sjyuan.spring.jwt.service.impl;
 
 import cc.sjyuan.spring.jwt.configuration.security.JWTUser;
+import cc.sjyuan.spring.jwt.entity.Privilege;
+import cc.sjyuan.spring.jwt.entity.Role;
 import cc.sjyuan.spring.jwt.entity.User;
 import cc.sjyuan.spring.jwt.exception.UserExistedException;
+import cc.sjyuan.spring.jwt.exception.UserNotExistException;
 import cc.sjyuan.spring.jwt.repository.UserRepository;
 import cc.sjyuan.spring.jwt.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +14,10 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+
+import static java.util.stream.Collectors.toList;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -27,7 +34,13 @@ public class UserServiceImpl implements UserService {
         if (user == null) {
             throw new UsernameNotFoundException("Username does not exist.");
         }
-        return JWTUser.builder().username(user.getName()).password(user.getPassword()).roles(user.getRoles()).build();
+        Role role = user.getRole();
+        return JWTUser.builder()
+                .username(user.getName())
+                .password(user.getPassword())
+                .role(user.getRole().getSymbol().name())
+                .privileges(role.getPrivileges().stream().map(Privilege::getSymbol).collect(toList()))
+                .build();
     }
 
     @Override
@@ -42,6 +55,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User findByName(String username) {
+        User user = userRepository.findByName(username);
+        if (user == null){
+            throw new UserNotExistException(username);
+        }
         return userRepository.findByName(username);
     }
 }

@@ -1,13 +1,13 @@
 package cc.sjyuan.spring.jwt.service.impl;
 
 import cc.sjyuan.spring.jwt.configuration.security.JWTUser;
+import cc.sjyuan.spring.jwt.entity.Privilege;
 import cc.sjyuan.spring.jwt.entity.User;
 import cc.sjyuan.spring.jwt.exception.InvalidCredentialException;
 import cc.sjyuan.spring.jwt.repository.TokenAuthRepository;
 import cc.sjyuan.spring.jwt.repository.UserRepository;
 import cc.sjyuan.spring.jwt.service.AuthService;
 import cc.sjyuan.spring.jwt.util.StringUtils;
-import cc.sjyuan.spring.jwt.util.UserFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -17,7 +17,11 @@ import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @Service
 public class AuthServiceImpl implements AuthService {
@@ -49,9 +53,14 @@ public class AuthServiceImpl implements AuthService {
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(user.getName(), user.getPassword()));
 
         User authorizedUser = userRepository.findByName(user.getName());
-        String authorizedUserJson = StringUtils.writeObjectAsJsonString(UserFactory.fromUser(authorizedUser));
-
-        response.addHeader(header, String.join(" ", tokenPrefix, authRepository.generateToken(authorizedUserJson)));
+        List<Privilege.Symbol> privileges = authorizedUser.getRole().getPrivileges().stream().map(Privilege::getSymbol).collect(Collectors.toList());
+        Map<String, Object> payload = new HashMap<String, Object>() {{
+            put("privileges", privileges);
+            put("username", authorizedUser.getName());
+            put("role", authorizedUser.getRole().getSymbol());
+        }};
+        response.addHeader(header, String.join(" ", tokenPrefix,
+                authRepository.generateToken(payload)));
         return authorizedUser;
     }
 
@@ -65,8 +74,8 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public JWTUser getAuthorizedJWTUser(HttpServletRequest request) {
-        String subject = authRepository.extractAuthorizedSubject(extractToken(request));
-        return StringUtils.readJsonStringAsObject(subject, JWTUser.class);
+        String payload = authRepository.extractAuthorizedPayload(extractToken(request));
+        return StringUtils.readJsonStringAsObject(payload, JWTUser.class);
     }
 
     @Override

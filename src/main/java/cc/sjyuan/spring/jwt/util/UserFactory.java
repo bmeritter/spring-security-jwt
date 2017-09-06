@@ -2,21 +2,17 @@ package cc.sjyuan.spring.jwt.util;
 
 
 import cc.sjyuan.spring.jwt.configuration.security.JWTUser;
+import cc.sjyuan.spring.jwt.entity.Privilege;
 import cc.sjyuan.spring.jwt.entity.User;
 
-public class UserFactory {
-    public static User fromJWTUser(JWTUser jwtUser){
-        User user = new User();
-        user.setName(jwtUser.getUsername());
-        user.setRoles(jwtUser.getRoles());
-        user.setPassword(jwtUser.getPassword());
-        return user;
-    }
+import java.util.stream.Collectors;
 
-    public static JWTUser fromUser(User user){
+public class UserFactory {
+    public static JWTUser fromUser(User user) {
         JWTUser jwtUser = new JWTUser();
         jwtUser.setUsername(user.getName());
-        jwtUser.setRoles(user.getRoles());
+        jwtUser.setRole(user.getRole().getSymbol().name());
+        jwtUser.setPrivileges(user.getRole().getPrivileges().stream().map(Privilege::getSymbol).collect(Collectors.toList()));
         return jwtUser;
     }
 }

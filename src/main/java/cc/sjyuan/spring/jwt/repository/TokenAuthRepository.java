@@ -1,8 +1,11 @@
 package cc.sjyuan.spring.jwt.repository;
 
+import java.util.Map;
+
 public interface TokenAuthRepository {
 
-    String generateToken(String subject);
-    String extractAuthorizedSubject(String token);
+    String generateToken(Map<String, Object> payload);
+
+    String extractAuthorizedPayload(String token);
 
 }

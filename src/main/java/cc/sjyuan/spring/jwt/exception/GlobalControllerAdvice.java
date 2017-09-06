@@ -22,4 +22,11 @@ public class GlobalControllerAdvice {
     public ResponseEntity<?> handleUserExistedException(UserExistedException e) {
         return ResponseEntity.badRequest().body(e.getMessage());
     }
+
+    @ExceptionHandler(UserNotExistException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public void handleUserNotExistException(UserNotExistException e) {
+        log.error(e.getMessage());
+    }
 }
+

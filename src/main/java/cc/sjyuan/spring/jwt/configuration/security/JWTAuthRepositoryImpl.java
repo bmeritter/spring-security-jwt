@@ -1,12 +1,14 @@
 package cc.sjyuan.spring.jwt.configuration.security;
 
 import cc.sjyuan.spring.jwt.repository.TokenAuthRepository;
+import cc.sjyuan.spring.jwt.util.StringUtils;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 
 import java.util.Date;
+import java.util.Map;
 
 @Repository
 public class JWTAuthRepositoryImpl implements TokenAuthRepository {
@@ -18,18 +20,18 @@ public class JWTAuthRepositoryImpl implements TokenAuthRepository {
     private long expirationInSeconds;
 
     @Override
-    public String generateToken(String subject) {
+    public String generateToken(Map<String, Object> payload) {
         return Jwts.builder()
-                .setSubject(subject)
+                .setClaims(payload)
                 .setExpiration(new Date(System.currentTimeMillis() + expirationInSeconds * 1000))
                 .signWith(SignatureAlgorithm.HS512, jwtSecret)
                 .compact();
     }
 
     @Override
-    public String extractAuthorizedSubject(String jwtToken) {
-        return Jwts.parser().setSigningKey(jwtSecret)
+    public String extractAuthorizedPayload(String jwtToken) {
+        return StringUtils.writeObjectAsJsonString(Jwts.parser().setSigningKey(jwtSecret)
                 .parseClaimsJws(jwtToken)
-                .getBody().getSubject();
+                .getBody());
     }
 }
