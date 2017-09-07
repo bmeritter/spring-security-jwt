@@ -2,11 +2,8 @@ package cc.sjyuan.spring.jwt.service.impl;
 
 import cc.sjyuan.spring.jwt.configuration.security.JWTUser;
 import cc.sjyuan.spring.jwt.configuration.security.LoginRequestUser;
-import cc.sjyuan.spring.jwt.entity.Privilege;
-import cc.sjyuan.spring.jwt.entity.User;
 import cc.sjyuan.spring.jwt.exception.InvalidCredentialException;
 import cc.sjyuan.spring.jwt.repository.TokenAuthRepository;
-import cc.sjyuan.spring.jwt.repository.UserRepository;
 import cc.sjyuan.spring.jwt.service.AuthService;
 import cc.sjyuan.spring.jwt.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,10 +17,8 @@ import org.springframework.stereotype.Service;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 @Service
 public class AuthServiceImpl implements AuthService {
@@ -51,11 +46,9 @@ public class AuthServiceImpl implements AuthService {
     public JWTUser login(HttpServletResponse response, LoginRequestUser loginRequestUser) {
         Authentication authenticate = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequestUser.getUsername(), loginRequestUser.getPassword()));
         JWTUser principal = (JWTUser) authenticate.getPrincipal();
-        Map<String, Object> payload = new HashMap<String, Object>() {{
-            put("privileges", principal.getPrivileges());
-            put("username", principal.getUsername());
-            put("role", principal.getRole());
-        }};
+
+        Map payload = StringUtils.readJsonStringAsObject(StringUtils.writeObjectAsJsonString(principal), Map.class);
+
         response.addHeader(header, String.join(" ", tokenPrefix,
                 authRepository.generateToken(payload)));
         return principal;

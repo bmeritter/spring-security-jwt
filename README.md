@@ -8,4 +8,4 @@ Usage of Spring security with JWT.
 - [Docker](https://www.docker.com/)
 - [Docker-compose](https://docs.docker.com/compose/gettingstarted/)
 - [Redis](https://redis.io/)
-- [MySQL5.7]()
+- [MySQL5.7](https://www.mysql.com/cn/)
