@@ -3,12 +3,14 @@ Usage of Spring security with JWT.
 
 ## Prerequisite and Skill stacks
 
-- JDK8
-- Gradle
-- Spring boot
+- [JDK8](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)
+- [Gradle](https://gradle.org/)
+- [Flyway](https://flywaydb.org/)
+- [Spring boot](https://projects.spring.io/spring-boot/)
 - [Docker](https://www.docker.com/)
 - [Docker-compose](https://docs.docker.com/compose/gettingstarted/)
 - [Redis](https://redis.io/)
+- [Nginx](https://nginx.org/en/)
 - [MySQL](https://www.mysql.com/cn/)
 
 
@@ -86,7 +88,7 @@ public class UserServiceImpl implements UserService {
 
 ## Integrate JWT with Spring Scurity
 
-Provide JWTAuthRepository
+**Provide JWTAuthRepository**
 
 ```java
 @Repository
@@ -115,6 +117,8 @@ public class JWTAuthRepositoryImpl implements TokenAuthRepository {
 
 #### Implement auth service
 
+Sever receives `username` and `password` from login request body, then do verification. Once it's passed, jwt token should be generated and attached to the response header.
+
 ```java
 @Service
 public class AuthServiceImpl implements AuthService {
@@ -130,3 +134,100 @@ public class AuthServiceImpl implements AuthService {
         return principal;
     }
 ```
+
+#### Handle user logout behaivor
+While user requests logout, jwt token should be put into a black list with the same expiration as itself.
+
+So a redis server is used to cache the logout token.
+
+```java
+@Override
+public void logout(HttpServletRequest request) {
+    String token = extractToken(request);
+    String key = PREFIX_BLACK_LIST + token;
+    redisTemplate.opsForValue().set(key, token);
+    redisTemplate.expire(key, expirationInSeconds, TimeUnit.SECONDS);
+}
+```
+
+
+#### Verify follow-up requests
+Using a `OncePerRequestFilter` to filter each user request after login. Verification goes as following steps:
+
+1. First check if the header `Authorization` exists. Absense of header means request is the login request or any other permited request, just let it go.
+2. header `Authorization` exists, then check if the token is in black list. Existence means the token has been invalid. Refuse request immediately.
+3. Token is not in black list, verify token and parse out the user info if valid.
+4. User info contains privileges which will determine which apis can be accessed.
+
+```java
+@Slf4j
+@Component
+public class JWTAuthenticationFilter extends OncePerRequestFilter {
+
+    @Autowired
+    private AuthService authService;
+
+    @Override
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+        if (!authService.hasJWTToken(request)) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+        handlerRequestAttachedJWTToken(request, response, filterChain);
+    }
+
+    private void handlerRequestAttachedJWTToken(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws IOException, ServletException {
+        try {
+            if (authService.isTokenInBlackList(request)) {
+                logger.error("Black list token.");
+                throw new InvalidCredentialException();
+            }
+
+            JWTUser jwtUser = authService.getAuthorizedJWTUser(request);
+            UsernamePasswordAuthenticationToken token =
+                    new UsernamePasswordAuthenticationToken(
+                            jwtUser, null, jwtUser.getAuthorities());
+
+            SecurityContextHolder.getContext().setAuthentication(token);
+
+            filterChain.doFilter(request, response);
+        } catch (ExpiredJwtException | SignatureException | InvalidCredentialException e) {
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token expired.");
+        }
+    }
+}
+```
+
+## Start up 
+
+#### One click start up server with docker
+
+Make sure the corresponing ports, such as`3307`,`8888`,`9000`,`6378` defined in `docker-compose.yml` file, are available. Of course, you can configure them.
+
+Make sure `Docker`and `Docker-compose` are installed in your machine.
+
+Run command to start up the Server:
+
+```sh
+$ docker-compose up -d
+```
+
+#### Start up with gradle task
+
+Firstly, start up the dependency servers.
+
+```sh
+$ docker-compose up -d mysql
+$ docker-compose up -d redis
+$ docker-compose up -d nginx
+```
+
+Start server with gradle task.
+
+```sh
+$./gradlew bootRun
+```
+
+## Login with admin/123
+待续
+
