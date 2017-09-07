@@ -1,14 +1,17 @@
 package cc.sjyuan.spring.jwt.configuration.security;
 
 import cc.sjyuan.spring.jwt.entity.Privilege;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,6 +29,9 @@ public class JWTUser implements UserDetails {
     private String password;
 
     private String role;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.sss")
+    private Date createdDateTime;
 
     private List<Privilege.Symbol> privileges;
 

@@ -13,6 +13,7 @@ public class UserFactory {
         jwtUser.setUsername(user.getName());
         jwtUser.setRole(user.getRole().getSymbol().name());
         jwtUser.setPrivileges(user.getRole().getPrivileges().stream().map(Privilege::getSymbol).collect(Collectors.toList()));
+        jwtUser.setCreatedDateTime(user.getCreatedDateTime());
         return jwtUser;
     }
 }
