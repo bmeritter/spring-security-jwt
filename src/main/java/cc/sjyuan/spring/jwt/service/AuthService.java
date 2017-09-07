@@ -2,6 +2,7 @@ package cc.sjyuan.spring.jwt.service;
 
 
 import cc.sjyuan.spring.jwt.configuration.security.JWTUser;
+import cc.sjyuan.spring.jwt.configuration.security.LoginRequestUser;
 import cc.sjyuan.spring.jwt.entity.User;
 
 import javax.servlet.http.HttpServletRequest;
@@ -16,5 +17,5 @@ public interface AuthService {
 
     boolean isTokenInBlackList(HttpServletRequest request);
 
-    User login(HttpServletResponse response, User user);
+    JWTUser login(HttpServletResponse response, LoginRequestUser loginRequestUser);
 }

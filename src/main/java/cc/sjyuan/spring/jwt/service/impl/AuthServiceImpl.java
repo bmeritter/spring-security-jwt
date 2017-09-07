@@ -1,6 +1,7 @@
 package cc.sjyuan.spring.jwt.service.impl;
 
 import cc.sjyuan.spring.jwt.configuration.security.JWTUser;
+import cc.sjyuan.spring.jwt.configuration.security.LoginRequestUser;
 import cc.sjyuan.spring.jwt.entity.Privilege;
 import cc.sjyuan.spring.jwt.entity.User;
 import cc.sjyuan.spring.jwt.exception.InvalidCredentialException;
@@ -13,6 +14,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
@@ -43,25 +45,20 @@ public class AuthServiceImpl implements AuthService {
     private AuthenticationManager authenticationManager;
 
     @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
     private RedisTemplate<String, String> redisTemplate;
 
     @Override
-    public User login(HttpServletResponse response, User user) {
-        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(user.getName(), user.getPassword()));
-
-        User authorizedUser = userRepository.findByName(user.getName());
-        List<Privilege.Symbol> privileges = authorizedUser.getRole().getPrivileges().stream().map(Privilege::getSymbol).collect(Collectors.toList());
+    public JWTUser login(HttpServletResponse response, LoginRequestUser loginRequestUser) {
+        Authentication authenticate = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequestUser.getUsername(), loginRequestUser.getPassword()));
+        JWTUser principal = (JWTUser) authenticate.getPrincipal();
         Map<String, Object> payload = new HashMap<String, Object>() {{
-            put("privileges", privileges);
-            put("username", authorizedUser.getName());
-            put("role", authorizedUser.getRole().getSymbol());
+            put("privileges", principal.getPrivileges());
+            put("username", principal.getUsername());
+            put("role", principal.getRole());
         }};
         response.addHeader(header, String.join(" ", tokenPrefix,
                 authRepository.generateToken(payload)));
-        return authorizedUser;
+        return principal;
     }
 
     @Override

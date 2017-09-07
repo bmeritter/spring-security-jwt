@@ -15,6 +15,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
 import java.util.List;
 
 import static java.util.stream.Collectors.toList;
@@ -47,6 +48,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public User create(User user) throws Exception {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setCreatedDateTime(new Date());
         if (userRepository.findByName(user.getName()) != null) {
             throw new UserExistedException("User already exists.");
         }

@@ -1,7 +1,7 @@
 package cc.sjyuan.spring.jwt.api;
 
 import cc.sjyuan.spring.jwt.configuration.security.JWTUser;
-import cc.sjyuan.spring.jwt.entity.User;
+import cc.sjyuan.spring.jwt.configuration.security.LoginRequestUser;
 import cc.sjyuan.spring.jwt.service.AuthService;
 import cc.sjyuan.spring.jwt.util.UserFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +26,7 @@ public class AuthController {
 
     @PostMapping("login")
     @ResponseStatus(HttpStatus.OK)
-    public JWTUser login(HttpServletResponse response, @RequestBody User user) throws Exception {
-        return UserFactory.fromUser(authService.login(response, user));
+    public JWTUser login(@RequestBody LoginRequestUser loginRequestUser, HttpServletResponse response) throws Exception {
+        return authService.login(response, loginRequestUser);
     }
 }
