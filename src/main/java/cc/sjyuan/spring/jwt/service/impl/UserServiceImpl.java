@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
-import java.util.List;
 
 import static java.util.stream.Collectors.toList;
 
@@ -58,7 +57,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public User findByName(String username) {
         User user = userRepository.findByName(username);
-        if (user == null){
+        if (user == null) {
             throw new UserNotExistException(username);
         }
         return userRepository.findByName(username);

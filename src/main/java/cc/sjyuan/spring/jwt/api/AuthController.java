@@ -3,7 +3,6 @@ package cc.sjyuan.spring.jwt.api;
 import cc.sjyuan.spring.jwt.configuration.security.JWTUser;
 import cc.sjyuan.spring.jwt.configuration.security.LoginRequestUser;
 import cc.sjyuan.spring.jwt.service.AuthService;
-import cc.sjyuan.spring.jwt.util.UserFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;

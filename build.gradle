@@ -66,6 +66,7 @@ ext.libs = [
 
 dependencies {
 	compile libs.spring, libs.utils, libs.database
+	compile('org.springframework.boot:spring-boot-starter-security')
 
 	testCompile libs.test
 }
