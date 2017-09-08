@@ -229,5 +229,24 @@ $./gradlew bootRun
 ```
 
 ## Login with admin/123
-待续
+Using `CURL` to test login.
+
+```sh
+$ curl -i -H "Content-Type: application/json" -X POST -d '{"username": "admin", "password": "123"}' localhost:8091/api/login
+
+HTTP/1.1 200
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 1; mode=block
+Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+Pragma: no-cache
+Expires: 0
+X-Frame-Options: DENY
+X-Application-Context: sems:local:8091
+Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwicm9sZSI6IlNZU1RFTV9BRE1JTiIsImNyZWF0ZWREYXRlVGltZSI6bnVsbCwicHJpdmlsZWdlcyI6WyJDUkVBVEVfVVNFUiIsIkRFTEVURV9VU0VSIiwiUkVUUklWRV9VU0VSIiwiVVBEQVRFX1VTRVIiXSwiZXhwIjoxNTA0ODMxMDY1fQ.CKAbbe8oZ9F8VU6xCKDkAOGqLyTdqajnRxXvR_XJgzn1c_GWvvbcN5Khfmvy4_idMSunUqSxpjCj6RRCUTCu1Q
+Content-Type: application/json;charset=UTF-8
+Transfer-Encoding: chunked
+Date: Fri, 08 Sep 2017 00:27:45 GMT
+
+{"username":"admin","role":"SYSTEM_ADMIN","createdDateTime":null,"privileges":["CREATE_USER","DELETE_USER","RETRIVE_USER","UPDATE_USER"]}%
+```
 
