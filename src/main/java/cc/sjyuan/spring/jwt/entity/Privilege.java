@@ -1,8 +1,7 @@
 package cc.sjyuan.spring.jwt.entity;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
+import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -11,6 +10,9 @@ import java.io.Serializable;
 @Getter
 @Entity
 @ToString
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "t_privilege")
 public class Privilege implements Serializable {
 

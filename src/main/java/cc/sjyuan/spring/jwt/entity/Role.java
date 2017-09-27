@@ -1,8 +1,6 @@
 package cc.sjyuan.spring.jwt.entity;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -12,7 +10,9 @@ import java.util.List;
 @Setter
 @Getter
 @Entity
-@ToString
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "t_role")
 public class Role implements Serializable {
 
@@ -40,7 +40,7 @@ public class Role implements Serializable {
 
     private String name;
 
-    @ManyToMany(cascade = CascadeType.REFRESH,fetch = FetchType.EAGER)
+    @ManyToMany(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
     @JoinTable(name = "t_role_privilege", joinColumns = @JoinColumn(name = "role_symbol", referencedColumnName = "symbol"),
             inverseJoinColumns = @JoinColumn(name = "privilege_symbol", referencedColumnName = "symbol"))
     private List<Privilege> privileges = new ArrayList<>();

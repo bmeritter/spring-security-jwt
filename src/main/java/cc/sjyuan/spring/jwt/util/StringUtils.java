@@ -9,7 +9,7 @@ import java.util.UUID;
 public final class StringUtils {
 
     public static String uuid() {
-        return UUID.randomUUID().toString().replace("-", "");
+        return UUID.randomUUID().toString();
     }
 
     public static String writeObjectAsJsonString(Object object) {

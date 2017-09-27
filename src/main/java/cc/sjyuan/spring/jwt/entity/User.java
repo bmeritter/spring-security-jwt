@@ -1,9 +1,7 @@
 package cc.sjyuan.spring.jwt.entity;
 
 import cc.sjyuan.spring.jwt.util.StringUtils;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -14,7 +12,8 @@ import java.util.Date;
 
 @Getter
 @Setter
-@ToString
+@Builder
+@AllArgsConstructor
 @Entity
 @Table(name = "t_user")
 @EntityListeners(AuditingEntityListener.class)
@@ -36,9 +35,7 @@ public class User implements Serializable {
     @LastModifiedDate
     private long updatedDate;
 
-    private Date createdDateTime;
-
-    @OneToOne(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "role")
     private Role role;
 

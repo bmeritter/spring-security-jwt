@@ -1,12 +1,11 @@
 package cc.sjyuan.spring.jwt.configuration.security;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
-@Getter
-@Setter
-@ToString
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class LoginRequestUser {
     private String username;
     private String password;

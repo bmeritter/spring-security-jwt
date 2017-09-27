@@ -11,19 +11,19 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 @RestController
-@RequestMapping("api")
-public class AuthController {
+@RequestMapping("/api/authentication")
+public class AuthenticationController {
 
     @Autowired
     private AuthService authService;
 
-    @PostMapping("logout")
+    @DeleteMapping
     @ResponseStatus(HttpStatus.OK)
     public void logout(HttpServletRequest request) throws Exception {
         authService.logout(request);
     }
 
-    @PostMapping("login")
+    @PostMapping
     @ResponseStatus(HttpStatus.OK)
     public JWTUser login(@RequestBody LoginRequestUser loginRequestUser, HttpServletResponse response) throws Exception {
         return authService.login(response, loginRequestUser);

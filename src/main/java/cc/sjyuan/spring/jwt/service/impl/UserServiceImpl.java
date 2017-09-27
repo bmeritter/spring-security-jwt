@@ -8,14 +8,13 @@ import cc.sjyuan.spring.jwt.exception.UserExistedException;
 import cc.sjyuan.spring.jwt.exception.UserNotExistException;
 import cc.sjyuan.spring.jwt.repository.UserRepository;
 import cc.sjyuan.spring.jwt.service.UserService;
+import cc.sjyuan.spring.jwt.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Date;
 
 import static java.util.stream.Collectors.toList;
 
@@ -45,9 +44,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public User create(User user) throws Exception {
+    public User create(User user) {
+        user.setId(StringUtils.uuid());
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        user.setCreatedDateTime(new Date());
         if (userRepository.findByName(user.getName()) != null) {
             throw new UserExistedException("User already exists.");
         }
